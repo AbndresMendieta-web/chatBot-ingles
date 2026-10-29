@@ -1,0 +1,8 @@
+﻿# Credenciales
+.env
+
+# Basura de macOS
+.DS_Store
+__MACOSX/
+
+node_modules/

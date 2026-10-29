@@ -1,0 +1,3 @@
+Clasifique el mensaje del cliente de una panadería. Responda con un JSON con dos claves: intencion (horario, precio, pedido, reclamo u otro) y urgente (true o false).
+=== USUARIO ===
+{{mensaje}}

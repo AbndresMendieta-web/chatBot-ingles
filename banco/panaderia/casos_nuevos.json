@@ -1,0 +1,8 @@
+[
+  { "id": 25, "mensaje": "Parce, ¿a cómo está el pan hoy?", "intencion": "precio", "urgente": false },
+  { "id": 26, "mensaje": "Señores, me cobraron dos veces la compra por Nequi y necesito que me devuelvan la plata ya mismo", "intencion": "reclamo", "urgente": true },
+  { "id": 27, "mensaje": "¿Mañana festivo abren en la mañana o está cerrado todo el día?", "intencion": "horario", "urgente": false },
+  { "id": 28, "mensaje": "Quiero encargar una torta de tres leches para 20 personas para este sábado, ¿con quién hablo?", "intencion": "pedido", "urgente": false },
+  { "id": 29, "mensaje": "¿Tienen parqueadero para carros o solo para motos?", "intencion": "otro", "urgente": false },
+  { "id": 30, "mensaje": "Pedi 3 roscones y un buñuelo pero me llego la bolsa rota y falta el buñuelo porfavor respondan rápido", "intencion": "reclamo", "urgente": true }
+]

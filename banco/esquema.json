@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "intencion": {
+      "type": "string",
+      "enum": ["ingreso", "inventario", "alerta", "reclamo", "otro"]
+    },
+    "urgente": { "type": "boolean" }
+  },
+  "required": ["intencion", "urgente"],
+  "additionalProperties": false
+}

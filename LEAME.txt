@@ -1,0 +1,16 @@
+MATERIAL DE APOYO - SESION 2 (Instructivo 2)
+Complementario: Implementacion de soluciones de inteligencia artificial (21730210)
+
+Descomprima este archivo DENTRO de su carpeta ia-sena y acepte reemplazar docker-compose.yml.
+No borre ni reemplace la carpeta ia-sena completa: perderia modelos/ y, si ya lo creo, su archivo .env.
+Si su equipo crea una subcarpeta material-sesion2, mueva su contenido a ia-sena.
+Luego siga el Instructivo 2 desde el Trabajo 1.
+
+Contenido:
+  docker-compose.yml   Ollama (igual que en la sesion 1) y n8n
+  .env.ejemplo         plantilla de variables; copiela con el nombre .env
+  banco/               cliente.mjs, preguntar.mjs, evaluar.mjs, mensaje.mjs, casos.json, esquema.json
+  prompts/             v1.txt, v2.txt, espiga.txt
+  flujos/              asistente-espiga.json (flujo terminado) y textos-para-copiar.txt
+
+Requiere Node.js 20 o superior y Docker.

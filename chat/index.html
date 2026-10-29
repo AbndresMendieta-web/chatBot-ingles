@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoodSena</title>
+<style>
+  :root {
+    --verde: #39a900;
+    --verde-oscuro: #2b7f00;
+    --fondo: #f3f5f2;
+    --tarjeta: #ffffff;
+    --texto: #1d2a1d;
+    --suave: #667066;
+    --burbuja-bot: #ffffff;
+    --burbuja-yo: #39a900;
+    --borde: #dfe4dd;
+    --aviso: #fff4d6;
+    --aviso-texto: #7a5a00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fondo: #121512;
+      --tarjeta: #1b201b;
+      --texto: #e6ebe6;
+      --suave: #9aa59a;
+      --burbuja-bot: #232a23;
+      --burbuja-yo: #2f8c00;
+      --borde: #2d352d;
+      --aviso: #3a3115;
+      --aviso-texto: #f0d27a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 720px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--tarjeta);
+    border-left: 1px solid var(--borde);
+    border-right: 1px solid var(--borde);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--verde);
+    color: #fff;
+  }
+  .logo {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--verde-oscuro);
+    display: grid; place-items: center;
+    font-weight: 800;
+  }
+  header h1 { margin: 0; font-size: 18px; }
+  header p { margin: 0; font-size: 13px; opacity: .9; }
+  #mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .burbuja {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .bot { align-self: flex-start; background: var(--burbuja-bot); border: 1px solid var(--borde); border-bottom-left-radius: 4px; }
+  .yo { align-self: flex-end; background: var(--burbuja-yo); color: #fff; border-bottom-right-radius: 4px; }
+  .aviso {
+    align-self: flex-start;
+    font-size: 13px;
+    background: var(--aviso);
+    color: var(--aviso-texto);
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+  .escribiendo { color: var(--suave); font-style: italic; }
+  .escribiendo span { animation: parpadeo 1.2s infinite; }
+  .escribiendo span:nth-child(2) { animation-delay: .2s; }
+  .escribiendo span:nth-child(3) { animation-delay: .4s; }
+  @keyframes parpadeo { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+  #sugerencias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 16px 10px;
+  }
+  #sugerencias button {
+    border: 1px solid var(--verde);
+    background: transparent;
+    color: var(--texto);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  #sugerencias button:hover { background: var(--verde); color: #fff; }
+  form {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--borde);
+  }
+  textarea {
+    flex: 1;
+    resize: none;
+    min-height: 44px;
+    max-height: 140px;
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    background: var(--fondo);
+    color: var(--texto);
+    font: inherit;
+  }
+  textarea:focus { outline: 2px solid var(--verde); border-color: transparent; }
+  form button {
+    border: 0;
+    border-radius: 12px;
+    padding: 0 18px;
+    background: var(--verde);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  form button:disabled { opacity: .5; cursor: default; }
+  .icono {
+    width: 44px;
+    padding: 0 !important;
+    display: grid;
+    place-items: center;
+    background: transparent !important;
+    border: 1px solid var(--borde) !important;
+    color: var(--texto) !important;
+  }
+  .icono svg { width: 22px; height: 22px; }
+  .icono[hidden] { display: none; }
+  #microfono.grabando { background: #d93025 !important; border-color: #d93025 !important; color: #fff !important; animation: pulso 1.2s infinite; }
+  @keyframes pulso { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, .5); } 50% { box-shadow: 0 0 0 6px rgba(217, 48, 37, 0); } }
+  #altavoz { border: 0; background: rgba(255, 255, 255, .15); color: #fff; margin-left: auto; border-radius: 10px; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; }
+  #altavoz svg { width: 22px; height: 22px; }
+  #altavoz[aria-pressed="false"] { opacity: .6; }
+  #altavoz[hidden] { display: none; }
+  #estado-voz { font-size: 13px; color: var(--suave); padding: 0 16px; min-height: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">FS</div>
+    <div>
+      <h1>FoodSena</h1>
+      <p>Servicio de gastronomía · SENA Yamboró</p>
+    </div>
+    <button id="altavoz" type="button" aria-pressed="false" title="Leer las respuestas en voz alta" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+    </button>
+  </header>
+
+  <div id="mensajes" aria-live="polite"></div>
+
+  <div id="sugerencias">
+    <button type="button">¿Cómo funciona el reconocimiento facial?</button>
+    <button type="button">¿Cómo registro una entrada en bodega?</button>
+    <button type="button">Se acabó el arroz</button>
+    <button type="button">El sistema no me deja entrar al comedor</button>
+  </div>
+
+  <div id="estado-voz" aria-live="polite"></div>
+  <form id="formulario">
+    <button id="microfono" class="icono" type="button" title="Hablar" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5"/></svg>
+    </button>
+    <textarea id="entrada" rows="1" maxlength="1000" placeholder="Escriba o toque el micrófono…" autofocus></textarea>
+    <button id="enviar" type="submit">Enviar</button>
+  </form>
+</div>
+
+<script>
+  const lista = document.getElementById('mensajes');
+  const formulario = document.getElementById('formulario');
+  const entrada = document.getElementById('entrada');
+  const enviar = document.getElementById('enviar');
+  const sugerencias = document.getElementById('sugerencias');
+
+  // textContent (no innerHTML): lo que escriba el usuario o el modelo nunca se ejecuta como HTML.
+  function agregar(texto, clase) {
+    const div = document.createElement('div');
+    div.className = clase;
+    div.textContent = texto;
+    lista.appendChild(div);
+    lista.scrollTop = lista.scrollHeight;
+    return div;
+  }
+
+  async function mandar(texto) {
+    texto = texto.trim();
+    if (!texto || enviar.disabled) return;
+    sugerencias.style.display = 'none';
+    estadoVoz.textContent = '';
+    agregar(texto, 'burbuja yo');
+    entrada.value = '';
+    entrada.style.height = '';
+    enviar.disabled = true;
+
+    const espera = agregar('', 'burbuja bot escribiendo');
+    espera.innerHTML = 'Escribiendo<span>.</span><span>.</span><span>.</span>';
+
+    try {
+      const r = await fetch('/api/mensaje', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensaje: texto }),
+      });
+      const d = await r.json();
+      espera.remove();
+      agregar(d.respuesta || 'No se recibió respuesta.', 'burbuja bot');
+      leer(d.respuesta);
+      if (d.avisar_humano) agregar('Se avisó a un encargado para que lo atienda.', 'aviso');
+    } catch {
+      espera.remove();
+      agregar('No hay conexión con el servidor. Intente de nuevo.', 'burbuja bot');
+    } finally {
+      enviar.disabled = false;
+      entrada.focus();
+    }
+  }
+
+  formulario.addEventListener('submit', (e) => { e.preventDefault(); mandar(entrada.value); });
+  // Enter envía; Shift+Enter hace un salto de línea.
+  entrada.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); mandar(entrada.value); }
+  });
+  entrada.addEventListener('input', () => {
+    entrada.style.height = '';
+    entrada.style.height = Math.min(entrada.scrollHeight, 140) + 'px';
+  });
+  sugerencias.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') mandar(e.target.textContent);
+  });
+
+  // ---------- Voz: dictado y lectura con las funciones del navegador ----------
+  const microfono = document.getElementById('microfono');
+  const altavoz = document.getElementById('altavoz');
+  const estadoVoz = document.getElementById('estado-voz');
+
+  // Dictado (Chrome y Edge). El texto queda en la caja para revisarlo antes de enviar.
+  const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Los problemas del micrófono se muestran en el chat para que se vean.
+  const avisoVoz = (texto) => {
+    estadoVoz.textContent = '';
+    agregar(texto, 'aviso');
+    console.warn('[voz]', texto);
+  };
+  microfono.hidden = false;
+  if (!Reconocimiento) {
+    microfono.addEventListener('click', () => avisoVoz('Este navegador no permite dictado por voz. Abra el chat en Chrome o Edge.'));
+  } else if (!window.isSecureContext) {
+    microfono.addEventListener('click', () => avisoVoz('El dictado solo funciona en http://localhost:3000 o en una dirección https.'));
+  } else {
+    const motivos = {
+      'not-allowed': 'Debe permitir el uso del micrófono: toque el candado junto a la dirección y active Micrófono.',
+      'service-not-allowed': 'El navegador no permite el dictado. En Windows active Configuración > Privacidad y seguridad > Voz > Reconocimiento de voz en línea.',
+      'no-speech': 'No se escuchó nada. Intente de nuevo hablando cerca del micrófono.',
+      'audio-capture': 'No se encontró un micrófono.',
+      'network': 'El servicio de dictado del navegador no respondió. Puede ser la red o un bloqueo del navegador.',
+      'language-not-supported': 'El navegador no reconoce el español de Colombia.',
+    };
+    // Cada toque crea un dictado nuevo: si uno se queda colgado, no bloquea los siguientes.
+    let rec = null;
+    let espera = null;
+
+    const terminar = () => {
+      clearTimeout(espera);
+      rec = null;
+      microfono.classList.remove('grabando');
+      microfono.title = 'Hablar';
+    };
+
+    microfono.addEventListener('click', () => {
+      if (rec) {
+        // Un segundo toque detiene la grabación (o cancela un intento que no arrancó).
+        const r = rec;
+        terminar();
+        try { r.abort(); } catch {}
+        estadoVoz.textContent = entrada.value.trim() ? 'Revise el texto y toque Enviar.' : '';
+        return;
+      }
+      const r = new Reconocimiento();
+      r.lang = 'es-CO';
+      r.interimResults = true;
+      r.continuous = false;
+      const previo = entrada.value.trim();
+      let empezo = false;
+      let oyo = false;
+      let fallo = false;
+
+      r.onstart = () => {
+        empezo = true;
+        clearTimeout(espera);
+        estadoVoz.textContent = 'Escuchando… hable ahora.';
+        if (window.speechSynthesis) speechSynthesis.cancel();
+      };
+      r.onresult = (e) => {
+        oyo = true;
+        let texto = '';
+        for (const x of e.results) texto += x[0].transcript;
+        entrada.value = (previo ? previo + ' ' : '') + texto.trim();
+        entrada.dispatchEvent(new Event('input'));
+      };
+      r.onerror = (e) => {
+        fallo = true;
+        if (e.error !== 'aborted') avisoVoz(`${motivos[e.error] || 'No se pudo usar el micrófono.'} (código: ${e.error})`);
+      };
+      r.onend = () => {
+        if (rec !== r) return;
+        terminar();
+        if (empezo && !oyo && !fallo) avisoVoz(motivos['no-speech']);
+        estadoVoz.textContent = oyo && entrada.value.trim() ? 'Revise el texto y toque Enviar.' : '';
+        entrada.focus();
+      };
+
+      rec = r;
+      microfono.classList.add('grabando');
+      microfono.title = 'Detener';
+      estadoVoz.textContent = 'Activando el micrófono…';
+      try {
+        r.start();
+      } catch (e) {
+        terminar();
+        avisoVoz(`No se pudo iniciar el micrófono (${e.name}).`);
+        return;
+      }
+      // Si el navegador acepta la orden pero nunca empieza a escuchar, se cancela y se explica.
+      espera = setTimeout(() => {
+        if (rec !== r || empezo) return;
+        terminar();
+        try { r.abort(); } catch {}
+        avisoVoz('El dictado del navegador no arrancó. En Windows active Configuración > Privacidad y seguridad > Voz > Reconocimiento de voz en línea, y revise que el navegador tenga permiso de micrófono (candado junto a la dirección).');
+      }, 5000);
+    });
+  }
+
+  // Lectura en voz alta con las voces instaladas en el equipo. Empieza apagada.
+  let leerRespuestas = false;
+  function leer(texto) {
+    if (!leerRespuestas || !texto || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const voz = new SpeechSynthesisUtterance(texto);
+    voz.lang = 'es-CO';
+    const vozEs = speechSynthesis.getVoices().find((v) => v.lang.startsWith('es'));
+    if (vozEs) voz.voice = vozEs;
+    speechSynthesis.speak(voz);
+  }
+  if (window.speechSynthesis) {
+    altavoz.hidden = false;
+    altavoz.addEventListener('click', () => {
+      leerRespuestas = !leerRespuestas;
+      altavoz.setAttribute('aria-pressed', String(leerRespuestas));
+      altavoz.title = leerRespuestas ? 'No leer las respuestas' : 'Leer las respuestas en voz alta';
+      if (!leerRespuestas) speechSynthesis.cancel();
+    });
+  }
+
+  agregar('¡Hola! Soy el asistente de FoodSena. Puedo ayudarle con el ingreso al comedor, el inventario de bodega y las alertas de productos. ¿En qué le puedo ayudar?', 'burbuja bot');
+</script>
+</body>
+</html>

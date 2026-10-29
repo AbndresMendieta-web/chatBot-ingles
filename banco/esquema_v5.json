@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "reporta_falla": { "type": "boolean" },
+    "producto_agotado": { "type": "boolean" },
+    "tema_bodega": { "type": "boolean" },
+    "tema_comedor": { "type": "boolean" },
+    "afecta_servicio_hoy": { "type": "boolean" }
+  },
+  "required": ["reporta_falla", "producto_agotado", "tema_bodega", "tema_comedor", "afecta_servicio_hoy"],
+  "additionalProperties": false
+}

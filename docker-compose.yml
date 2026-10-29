@@ -1,0 +1,38 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    environment:
+      # Dos espacios en memoria: uno para el prompt del clasificador y otro para el del asistente.
+      - OLLAMA_NUM_PARALLEL=2
+      # No descargar el modelo de la memoria cuando pasa un rato sin uso.
+      - OLLAMA_KEEP_ALIVE=-1
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./modelos:/modelos
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-2.35.7}
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    env_file: .env
+    environment:
+      - LOCAL_URL=http://ollama:11434/v1
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - N8N_SECURE_COOKIE=false
+      - GENERIC_TIMEZONE=America/Bogota
+      - TZ=America/Bogota
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./flujos:/flujos
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_models:
+  n8n_data:
